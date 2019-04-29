@@ -11,9 +11,10 @@ from seqlearn.evaluation import bio_f_score
 from seqlearn.perceptron import StructuredPerceptron
 from sklearn.metrics import accuracy_score
 
-file = "gene-train80.txt"
+file = "gene-test20.txt"
 data = pd.read_csv(file, sep='\t', header=None, skip_blank_lines=False)
 data.columns = ['SentCount', 'Word', 'Tag']
+print("Data:", len(data))
 
 #shows tag distribution of all data
 tag_distribution = data.groupby("Tag").size().reset_index(name='counts')
@@ -49,7 +50,6 @@ def load_data():
     train = load_conll(trainFile, features)
     X_train, _, lengths_train = train
     describe(X_train, lengths_train)
-    print(X_train)
 
     print("Loading test data...", end=" ")
     test = load_conll(testFile, features)
@@ -77,6 +77,7 @@ if __name__ == "__main__":
     clf.fit(X_train, y_train, lengths_train)
 
     y_pred = clf.predict(X_test, lengths_test)
+    print(len(y_pred))
     print("Accuracy: %.3f" % (100 * accuracy_score(y_test, y_pred)))
     print("CoNLL F1: %.3f" % (100 * bio_f_score(y_test, y_pred)))
 
