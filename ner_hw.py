@@ -49,6 +49,7 @@ def load_data():
     print("Loading training data...", end=" ")
     train = load_conll(trainFile, features)
     X_train, _, lengths_train = train
+    #printing length of both
     describe(X_train, lengths_train)
 
     print("Loading test data...", end=" ")
@@ -74,6 +75,7 @@ if __name__ == "__main__":
 
     clf = StructuredPerceptron(verbose=True, max_iter=10)
     print("Training %s" % clf)
+    #what does this do??
     clf.fit(X_train, y_train, lengths_train)
 
     y_pred = clf.predict(X_test, lengths_test)
