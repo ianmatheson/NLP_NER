@@ -28,7 +28,6 @@ def describe(X, lengths):
 
 def features(sentence, i):
 	word = sentence[i]
-	print(word)
 
 	yield "word:{}" + word.lower()
 
@@ -63,33 +62,57 @@ def load_data(trainFile, testFile):
 
 
 if __name__ == "__main__":
-    trainFile = 'gene-train80.txt'
-    # testFile = 'gene-test20.txt'
-    # testFile = 'test-run-test.txt'
-    testDummyCol = 'test-dummy-column.txt'
+	trainFile = 'gene-trainF18.txt'
+	testFile = 'test-run-test.txt'
+	testDummyCol = 'test-dummy-column.txt'
+	testCorrect = 'test-run-test-with-keys.txt'
 
-    # with open(testFile, 'r') as old_file:
-    # 	with open(testDummyCol, 'w') as new_file:
-    # 		for line in old_file:
-    # 			if not line.strip():
-    # 				new_file.write(line)
-    # 			else:
+	#updating test file with dummy column
+	#ONLY RUN ONCE
+	# with open(testFile, 'r') as old_file:
+	# 	with open(testDummyCol, 'w') as new_file:
+	# 		for line in old_file:
+	# 			if not line.strip():
+	# 				new_file.write(line)
+	# 			else:
 	   #  			line = line.rstrip('\n')
 	   #  			line += "\tB\n"
 	   #  			new_file.write(line)
 
-    train, test = load_data(trainFile, testDummyCol)
-    X_train, y_train, lengths_train = train
-    X_test, y_test, lengths_test = test
+	train, test = load_data(trainFile, testDummyCol)
+	X_train, y_train, lengths_train = train
+	X_test, y_test, lengths_test = test
 
-    clf = StructuredPerceptron(verbose=True, max_iter=10)
-    print("Training %s" % clf)
-    #what does this do??
-    clf.fit(X_train, y_train, lengths_train)
+	clf = StructuredPerceptron(verbose=True, max_iter=10)
+	print("Training %s" % clf)
+	#what does this do??
+	clf.fit(X_train, y_train, lengths_train)
+	y_pred = clf.predict(X_test, lengths_test)
 
-    y_pred = clf.predict(X_test, lengths_test)
-    for i in range(len(y_pred)):
-    	print(y_pred[i])
-    print("Accuracy: %.3f" % (100 * accuracy_score(y_test, y_pred)))
-    print("CoNLL F1: %.3f" % (100 * bio_f_score(y_test, y_pred)))
+	print(len(y_pred))
+	with open(testFile, 'r') as old_file:
+		with open('output.txt', 'w') as new_file:
+			index = 0
+			for i, line in enumerate(old_file):
+				if not line.strip():
+					new_file.write(line)
+				else:
+					line = line.rstrip('\n')
+					line += "\t"+y_pred[index]+"\n"
+					new_file.write(line)
+					index += 1
+
+	correctTags = []
+	with open(testCorrect, 'rb+') as correct_file:
+		for line in correct_file:
+			if not line.strip():
+				continue
+			else:
+				line = line.strip()
+
+	print("Accuracy: %.3f" % (100 * accuracy_score(y_test, y_pred)))
+	print("CoNLL F1: %.3f" % (100 * bio_f_score(y_test, y_pred)))
+
+
+
 
