@@ -25,7 +25,7 @@ def describe(X, lengths):
 
 def features(sentence, i):
     word = sentence[i]
-
+    print(word)
     yield "word:{}" + word.lower()
 
     if word[0].isupper():
