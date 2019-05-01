@@ -1,4 +1,6 @@
 #Code that will return an output of named entities
+#PARTNERS: Hannah Haines and Ian Matheson
+
 from __future__ import print_function
 import fileinput
 from glob import glob
@@ -62,10 +64,22 @@ def load_data(trainFile, testFile):
 
 
 if __name__ == "__main__":
-    trainFile = 'gene-trainF18.txt'
+    trainFile = 'gene-train80.txt'
+    # testFile = 'gene-test20.txt'
+    # tempFile = 'temp.txt'
     testFile = 'test-run-test.txt'
+    # with open(testFile, 'r') as full_file:
+    # 	with open(tempFile, 'w') as abrevF:
+    # 		for line in full_file:
+    # 			if not line.strip():
+    # 				abrevF.write(line)
+    # 			else:
+    # 				line = line.rstrip('\n')
+    # 				line = line[:-2] + '\n' #getting rid of tags
+    # 				abrevF.write(line)
+
     testDummyCol = 'test-dummy-column.txt'
-    testCorrect = 'test-run-test-with-keys.txt'
+    testCorrect = 'gene-test20.txt'
 
     #updating test file with dummy column
     #ONLY RUN ONCE
@@ -90,35 +104,35 @@ if __name__ == "__main__":
     y_pred = clf.predict(X_test, lengths_test)
 
     #print(len(y_pred))
-    #with open(testFile, 'r') as old_file:
-    #    with open('output.txt', 'w') as new_file:
-    #        index = 0
-    #        for i, line in enumerate(old_file):
-    #            if not line.strip():
-    #                new_file.write(line)
-    #            else:
-       #             line = line.rstrip('\n')
-       #             line += "\t"+y_pred[index]+"\n"
-       #             new_file.write(line)
-       #             index += 1
+    with open(testFile, 'r') as old_file:
+       with open('output.txt', 'w') as new_file:
+           index = 0
+           for i, line in enumerate(old_file):
+               if not line.strip():
+                   new_file.write(line)
+               else:
+                   line = line.rstrip('\n')
+                   line += "\t"+y_pred[index]+"\n"
+                   new_file.write(line)
+                   index += 1
 
-    correctTags = []
-    with open(testCorrect, 'r') as correct_file:
-        for line in correct_file:
-            if not line.strip():
-                continue
-            else:
-                line = line.split()
-                correctTags.append(line[-1])
+    # correctTags = []
+    # with open(testCorrect, 'r') as correct_file:
+    #     for line in correct_file:
+    #         if not line.strip():
+    #             continue
+    #         else:
+    #             line = line.split()
+    #             correctTags.append(line[-1])
                 
-    correct = 0
-    for index,val in enumerate(correctTags):
-        if(correctTags[index] == y_pred[index]):
-            correct +=1
+    # correct = 0
+    # for index,val in enumerate(correctTags):
+    # 	#True positive
+    #     if(correctTags[index] == y_pred[index]):
+    #         correct +=1
 
-    print("Precision: ", correct/len(correctTags))
-    print("Accuracy: %.3f" % (100 * accuracy_score(y_test, y_pred)))
-    print("CoNLL F1: %.3f" % (100 * bio_f_score(y_test, y_pred)))
-
+    # print("Accuracy: ", correct/len(correctTags))
+    # print("Accuracy: %.3f" % (100 * accuracy_score(y_test, y_pred)))
+    # print("CoNLL F1: %.3f" % (100 * bio_f_score(y_test, y_pred)))
 
 

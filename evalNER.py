@@ -68,6 +68,7 @@ def taggedData(file):
             yield line.strip().split()[1:]
 
 if __name__ == "__main__":
+    #correct first, output.txt
       keys = open(sys.argv[1], 'rU')
       predictions = open(sys.argv[2], 'rU')
       eval(keys, predictions)
