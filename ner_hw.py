@@ -27,21 +27,21 @@ def describe(X, lengths):
     print("{0} sequences, {1} tokens.".format(len(lengths), X.shape[0]))
 
 def features(sentence, i):
-	word = sentence[i]
+    word = sentence[i]
 
-	yield "word:{}" + word.lower()
+    yield "word:{}" + word.lower()
 
-	if word[0].isupper():
-	    yield "CAP"
+    if word[0].isupper():
+        yield "CAP"
 
-	if i > 0:
-	    yield "word-1:{}" + sentence[i - 1].lower()
-	    if i > 1:
-	        yield "word-2:{}" + sentence[i - 2].lower()
-	if i + 1 < len(sentence):
-	    yield "word+1:{}" + sentence[i + 1].lower()
-	    if i + 2 < len(sentence):
-	        yield "word+2:{}" + sentence[i + 2].lower()
+    if i > 0:
+        yield "word-1:{}" + sentence[i - 1].lower()
+        if i > 1:
+            yield "word-2:{}" + sentence[i - 2].lower()
+    if i + 1 < len(sentence):
+        yield "word+1:{}" + sentence[i + 1].lower()
+        if i + 2 < len(sentence):
+            yield "word+2:{}" + sentence[i + 2].lower()
 
 
 def load_data(trainFile, testFile):
@@ -62,57 +62,63 @@ def load_data(trainFile, testFile):
 
 
 if __name__ == "__main__":
-	trainFile = 'gene-trainF18.txt'
-	testFile = 'test-run-test.txt'
-	testDummyCol = 'test-dummy-column.txt'
-	testCorrect = 'test-run-test-with-keys.txt'
+    trainFile = 'gene-trainF18.txt'
+    testFile = 'test-run-test.txt'
+    testDummyCol = 'test-dummy-column.txt'
+    testCorrect = 'test-run-test-with-keys.txt'
 
-	#updating test file with dummy column
-	#ONLY RUN ONCE
-	# with open(testFile, 'r') as old_file:
-	# 	with open(testDummyCol, 'w') as new_file:
-	# 		for line in old_file:
-	# 			if not line.strip():
-	# 				new_file.write(line)
-	# 			else:
-	   #  			line = line.rstrip('\n')
-	   #  			line += "\tB\n"
-	   #  			new_file.write(line)
+    #updating test file with dummy column
+    #ONLY RUN ONCE
+    with open(testFile, 'r') as old_file:
+     	with open(testDummyCol, 'w') as new_file:
+     		for line in old_file:
+     			if not line.strip():
+     				new_file.write(line)
+     			else:
+         			line = line.rstrip('\n')
+         			line += "\tB\n"
+         			new_file.write(line)
 
-	train, test = load_data(trainFile, testDummyCol)
-	X_train, y_train, lengths_train = train
-	X_test, y_test, lengths_test = test
+    train, test = load_data(trainFile, testDummyCol)
+    X_train, y_train, lengths_train = train
+    X_test, y_test, lengths_test = test
 
-	clf = StructuredPerceptron(verbose=True, max_iter=10)
-	print("Training %s" % clf)
-	#what does this do??
-	clf.fit(X_train, y_train, lengths_train)
-	y_pred = clf.predict(X_test, lengths_test)
+    clf = StructuredPerceptron(verbose=True, max_iter=10)
+    print("Training %s" % clf)
+    #what does this do??
+    clf.fit(X_train, y_train, lengths_train)
+    y_pred = clf.predict(X_test, lengths_test)
 
-	print(len(y_pred))
-	with open(testFile, 'r') as old_file:
-		with open('output.txt', 'w') as new_file:
-			index = 0
-			for i, line in enumerate(old_file):
-				if not line.strip():
-					new_file.write(line)
-				else:
-					line = line.rstrip('\n')
-					line += "\t"+y_pred[index]+"\n"
-					new_file.write(line)
-					index += 1
+    #print(len(y_pred))
+    #with open(testFile, 'r') as old_file:
+    #    with open('output.txt', 'w') as new_file:
+    #        index = 0
+    #        for i, line in enumerate(old_file):
+    #            if not line.strip():
+    #                new_file.write(line)
+    #            else:
+       #             line = line.rstrip('\n')
+       #             line += "\t"+y_pred[index]+"\n"
+       #             new_file.write(line)
+       #             index += 1
 
-	correctTags = []
-	with open(testCorrect, 'rb+') as correct_file:
-		for line in correct_file:
-			if not line.strip():
-				continue
-			else:
-				line = line.strip()
+    correctTags = []
+    with open(testCorrect, 'r') as correct_file:
+        for line in correct_file:
+            if not line.strip():
+                continue
+            else:
+                line = line.split()
+                correctTags.append(line[-1])
+                
+    correct = 0
+    for index,val in enumerate(correctTags):
+        if(correctTags[index] == y_pred[index]):
+            correct +=1
 
-	print("Accuracy: %.3f" % (100 * accuracy_score(y_test, y_pred)))
-	print("CoNLL F1: %.3f" % (100 * bio_f_score(y_test, y_pred)))
-
+    print("Precision: ", correct/len(correctTags))
+    print("Accuracy: %.3f" % (100 * accuracy_score(y_test, y_pred)))
+    print("CoNLL F1: %.3f" % (100 * bio_f_score(y_test, y_pred)))
 
 
 
