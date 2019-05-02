@@ -16,10 +16,10 @@ from tempfile import mkstemp
 from shutil import move
 from os import fdopen, remove
 
-file = "gene-test20.txt"
-data = pd.read_csv(file, sep='\t', header=None, skip_blank_lines=False)
-data.columns = ['SentCount', 'Word', 'Tag']
-print("Data:", len(data))
+# file = "gene-test20.txt"
+# data = pd.read_csv(file, sep='\t', header=None, skip_blank_lines=False)
+# data.columns = ['SentCount', 'Word', 'Tag']
+# print("Data:", len(data))
 
 #shows tag distribution of all data
 # tag_distribution = data.groupby("Tag").size().reset_index(name='counts')
@@ -64,7 +64,7 @@ def load_data(trainFile, testFile):
 
 
 if __name__ == "__main__":
-    trainFile = 'gene-train80.txt'
+    trainFile = 'gene-trainF18.txt'
     # testFile = 'gene-test20.txt'
     # tempFile = 'temp.txt'
     testFile = 'test-run-test.txt'
@@ -79,7 +79,7 @@ if __name__ == "__main__":
     # 				abrevF.write(line)
 
     testDummyCol = 'test-dummy-column.txt'
-    testCorrect = 'gene-test20.txt'
+    testCorrect = 'test-run-test-with-keys.txt'
 
     #updating test file with dummy column
     #ONLY RUN ONCE
