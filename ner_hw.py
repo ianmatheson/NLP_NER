@@ -16,34 +16,26 @@ from tempfile import mkstemp
 from shutil import move
 from os import fdopen, remove
 
-# file = "gene-test20.txt"
-# data = pd.read_csv(file, sep='\t', header=None, skip_blank_lines=False)
-# data.columns = ['SentCount', 'Word', 'Tag']
-# print("Data:", len(data))
-
-#shows tag distribution of all data
-# tag_distribution = data.groupby("Tag").size().reset_index(name='counts')
-# print(tag_distribution)
-
 def describe(X, lengths):
     print("{0} sequences, {1} tokens.".format(len(lengths), X.shape[0]))
 
 def features(sentence, i):
-    word = sentence[i]
+	word = sentence[i]
+	word = word.split('\t')
+	word = word[1]
+	yield "word:{}" + word.lower()
 
-    yield "word:{}" + word.lower()
+	if word[0].isupper():
+	    yield "CAP"
 
-    if word[0].isupper():
-        yield "CAP"
-
-    if i > 0:
-        yield "word-1:{}" + sentence[i - 1].lower()
-        if i > 1:
-            yield "word-2:{}" + sentence[i - 2].lower()
-    if i + 1 < len(sentence):
-        yield "word+1:{}" + sentence[i + 1].lower()
-        if i + 2 < len(sentence):
-            yield "word+2:{}" + sentence[i + 2].lower()
+	if i > 0:
+		yield "word-1:{}" + sentence[i - 1].lower().split('\t')[1]
+		if i > 1:
+		    yield "word-2:{}" + sentence[i - 2].lower().split('\t')[1]
+	if i + 1 < len(sentence):
+		yield "word+1:{}" + sentence[i + 1].lower().split('\t')[1]
+		if i + 2 < len(sentence):
+		    yield "word+2:{}" + sentence[i + 2].lower().split('\t')[1]
 
 
 def load_data(trainFile, testFile):
@@ -65,9 +57,13 @@ def load_data(trainFile, testFile):
 
 if __name__ == "__main__":
     trainFile = 'gene-trainF18.txt'
-    # testFile = 'gene-test20.txt'
+    # trainFile = 'gene-train80.txt'
     # tempFile = 'temp.txt'
     testFile = 'test-run-test.txt'
+   	#Needed for load_conll to work properly
+    testDummyCol = 'test-dummy-column.txt'
+
+    #USED FOR RUNNING 20% TEST SPLIT ---- NOT NEEDED FOR NEW TEST SET
     # with open(testFile, 'r') as full_file:
     # 	with open(tempFile, 'w') as abrevF:
     # 		for line in full_file:
@@ -77,9 +73,6 @@ if __name__ == "__main__":
     # 				line = line.rstrip('\n')
     # 				line = line[:-2] + '\n' #getting rid of tags
     # 				abrevF.write(line)
-
-    testDummyCol = 'test-dummy-column.txt'
-    testCorrect = 'test-run-test-with-keys.txt'
 
     #updating test file with dummy column
     #ONLY RUN ONCE
@@ -93,17 +86,18 @@ if __name__ == "__main__":
          			line += "\tB\n"
          			new_file.write(line)
 
+    #loading train and test data
     train, test = load_data(trainFile, testDummyCol)
     X_train, y_train, lengths_train = train
     X_test, y_test, lengths_test = test
 
-    clf = StructuredPerceptron(verbose=True, max_iter=10)
+    #Creating training model
+    clf = StructuredPerceptron(verbose=True, max_iter=15)
     print("Training %s" % clf)
-    #what does this do??
     clf.fit(X_train, y_train, lengths_train)
     y_pred = clf.predict(X_test, lengths_test)
 
-    #print(len(y_pred))
+    #WRITING RESULTS TO OUTPUT.TXT
     with open(testFile, 'r') as old_file:
        with open('output.txt', 'w') as new_file:
            index = 0
@@ -115,24 +109,5 @@ if __name__ == "__main__":
                    line += "\t"+y_pred[index]+"\n"
                    new_file.write(line)
                    index += 1
-
-    # correctTags = []
-    # with open(testCorrect, 'r') as correct_file:
-    #     for line in correct_file:
-    #         if not line.strip():
-    #             continue
-    #         else:
-    #             line = line.split()
-    #             correctTags.append(line[-1])
-                
-    # correct = 0
-    # for index,val in enumerate(correctTags):
-    # 	#True positive
-    #     if(correctTags[index] == y_pred[index]):
-    #         correct +=1
-
-    # print("Accuracy: ", correct/len(correctTags))
-    # print("Accuracy: %.3f" % (100 * accuracy_score(y_test, y_pred)))
-    # print("CoNLL F1: %.3f" % (100 * bio_f_score(y_test, y_pred)))
 
 
