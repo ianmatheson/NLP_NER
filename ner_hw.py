@@ -57,9 +57,7 @@ def load_data(trainFile, testFile):
 
 if __name__ == "__main__":
     trainFile = 'gene-trainF18.txt'
-    # trainFile = 'gene-train80.txt'
-    # tempFile = 'temp.txt'
-    testFile = 'test-run-test.txt'
+    testFile = 'F18-assgn4-test.txt'
    	#Needed for load_conll to work properly
     testDummyCol = 'test-dummy-column.txt'
 
